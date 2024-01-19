@@ -1,18 +1,24 @@
 interface Obj {
-  x: number; y: number;
+  x: number;
+  y: number;
   update(): void;
   draw(ctx: CanvasRenderingContext2D): void;
 }
 
 interface Square {
-  x: number; y: number;
-  size: number, color: string;
+  x: number;
+  y: number;
+  size: number;
+  color: string;
 }
 
 abstract class RigidObject implements Obj {
-  vx: number = 0; vy: number = 0; ax: number = 0; ay: number = gravity;
+  vx: number = 0;
+  vy: number = 0;
+  ax: number = 0;
+  ay: number = gravity;
 
-  constructor(public x: number, public y: number) { }
+  constructor(public x: number, public y: number) {}
 
   update() {
     this.x += this.vx;
@@ -33,9 +39,14 @@ abstract class RigidObject implements Obj {
 }
 
 abstract class StaticSquare implements Square, Obj {
-  constructor(public x: number, public y: number, public size: number, public color: string) { }
+  constructor(
+    public x: number,
+    public y: number,
+    public size: number,
+    public color: string
+  ) {}
 
-  update() { }
+  update() {}
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = this.color;
@@ -45,7 +56,9 @@ abstract class StaticSquare implements Square, Obj {
 }
 
 abstract class RigidSquare extends RigidObject implements Square {
-  constructor(x: number, y: number, public size: number, public color: string) { super(x, y) }
+  constructor(x: number, y: number, public size: number, public color: string) {
+    super(x, y);
+  }
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = this.color;
@@ -66,7 +79,14 @@ class MovingBlock extends StaticSquare {
   turnFrame: number;
   nowFrame: number = 0;
 
-  constructor(x: number, y: number, size: number, speedx: number, speedy: number, turnFrame: number) {
+  constructor(
+    x: number,
+    y: number,
+    size: number,
+    speedx: number,
+    speedy: number,
+    turnFrame: number
+  ) {
     super(x, y, size, "#c46f00");
     this.speedx = speedx;
     this.speedy = speedy;
@@ -93,9 +113,9 @@ class Goal extends StaticSquare {
 
 class Ground implements Obj {
   x: number = 0;
-  constructor(public y: number) { }
+  constructor(public y: number) {}
 
-  update() { }
+  update() {}
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = "#00b818";
@@ -105,9 +125,9 @@ class Ground implements Obj {
 
 class TextElement implements Obj {
   text: string = "";
-  constructor(public x: number, public y: number) { }
+  constructor(public x: number, public y: number) {}
 
-  update() { }
+  update() {}
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.font = "24px serif";
@@ -119,7 +139,7 @@ class TextElement implements Obj {
 class BackGround implements Obj {
   x: number = 0;
   y: number = 0;
-  update() { }
+  update() {}
 
   draw(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = "#ffffff";
@@ -138,8 +158,12 @@ class Player extends RigidSquare {
   constructor() {
     super(windowWidth / 4, windowHeight / 2, 50, "#2478ff");
     for (let i = 0; i < 256; i++) this.key[i] = 0;
-    this.onKeyDown = function(event: KeyboardEvent) { this.key[event.keyCode]++; }
-    this.onKeyUp = function(event: KeyboardEvent) { this.key[event.keyCode] = 0; }
+    this.onKeyDown = function (event: KeyboardEvent) {
+      this.key[event.keyCode]++;
+    };
+    this.onKeyUp = function (event: KeyboardEvent) {
+      this.key[event.keyCode] = 0;
+    };
     window.addEventListener("message", (e) => {
       switch (e.data.type) {
         case "keydown":
@@ -161,33 +185,29 @@ class Player extends RigidSquare {
         this.onPlain = false;
       }
     if (this.key["D".charCodeAt(0)] > 0)
-      if (this.x < windowWidth - this.size / 2)
-        this.x += 8;
+      if (this.x < windowWidth - this.size / 2) this.x += 8;
     if (this.key["A".charCodeAt(0)] > 0)
-      if (this.x > this.size / 2)
-        this.x -= 8;
+      if (this.x > this.size / 2) this.x -= 8;
     this.x += this.inertiax;
     this.y += this.inertiay;
     this.inertiax = 0;
     this.inertiay = 0;
-    super.update()
+    super.update();
   }
 }
 
 class Enemy extends RigidSquare {
   onPlain: boolean = false;
-  constructor(x:number, y:number) {
+  constructor(x: number, y: number) {
     super(x, y, 50, "#f53e31");
     this.size = 50;
-    this.vx = -4
+    this.vx = -4;
   }
 
   update() {
-    super.update()
-    if (this.x < 0)
-      this.vx *= -1;
-    if (this.x > windowWidth)
-      this.vx *= -1;
+    super.update();
+    if (this.x < 0) this.vx *= -1;
+    if (this.x > windowWidth) this.vx *= -1;
   }
 }
 
@@ -195,7 +215,7 @@ function init(width: number, height: number) {
   const cvs = document.createElement("canvas");
   cvs.width = width;
   cvs.height = height;
-  document.getElementById('container')?.appendChild(cvs);
+  document.getElementById("container")?.appendChild(cvs);
   return cvs;
 }
 
@@ -207,17 +227,13 @@ function hitSquarePlain(square: Square, plain: Obj) {
 }
 
 function hit2Square(s1: Square, s2: Square) {
-  const S = (s1.size + s2.size) / 2
+  const S = (s1.size + s2.size) / 2;
   if (Math.abs(s1.y - s2.y) <= S && Math.abs(s1.x - s2.x) <= S) {
     let dx, dy;
-    if (s1.x > s2.x)
-      dx = s1.x - s2.x - S;
-    else
-      dx = s1.x - s2.x + S;
-    if (s1.y > s2.y)
-      dy = s1.y - s2.y - S;
-    else
-      dy = s1.y - s2.y + S;
+    if (s1.x > s2.x) dx = s1.x - s2.x - S;
+    else dx = s1.x - s2.x + S;
+    if (s1.y > s2.y) dy = s1.y - s2.y - S;
+    else dy = s1.y - s2.y + S;
     return [dx, dy];
   }
   return false;
@@ -227,33 +243,33 @@ function checkHit(objects: Obj[]) {
   let onPlain = false;
   let player: Player | undefined = undefined;
   for (const o1 of objects) {
-    if (o1 instanceof Player)
-      player = o1;
+    if (o1 instanceof Player) player = o1;
     for (const o2 of objects) {
       if ((o1 instanceof Player || o1 instanceof Enemy) && o2 instanceof Ground)
         if (hitSquarePlain(o1, o2)) {
           o1.vy = o1.ay = 0;
           o1.y = o2.y - o1.size / 2;
-          if (o1 instanceof Player)
-            onPlain = true;
+          if (o1 instanceof Player) onPlain = true;
         }
       if (o1 instanceof Player && o2 instanceof Enemy) {
         if (hit2Square(o1, o2)) {
           clearInterval(game);
-          statusText.text = "Game Over!!"
+          statusText.text = "Game Over!!";
         }
       }
       if (o1 instanceof Player && o2 instanceof Goal) {
         if (hit2Square(o1, o2)) {
           clearInterval(game);
-          statusText.text = "Game Clear!!"
+          statusText.text = "Game Clear!!";
         }
       }
-      if (o1 instanceof Player && o2 instanceof Block || o1 instanceof Player && o2 instanceof MovingBlock) {
-        const hit = hit2Square(o1, o2)
+      if (
+        (o1 instanceof Player && o2 instanceof Block) ||
+        (o1 instanceof Player && o2 instanceof MovingBlock)
+      ) {
+        const hit = hit2Square(o1, o2);
         if (hit) {
-          if (Math.abs(hit[0]) < Math.abs(hit[1]))
-            o1.x -= hit[0];
+          if (Math.abs(hit[0]) < Math.abs(hit[1])) o1.x -= hit[0];
           else {
             o1.y -= hit[1];
             if (hit[1] >= 0) {
@@ -269,8 +285,7 @@ function checkHit(objects: Obj[]) {
       }
     }
   }
-  if (player)
-    player.onPlain = onPlain;
+  if (player) player.onPlain = onPlain;
 }
 
 function loop(objects: Obj[], ctx: CanvasRenderingContext2D) {
@@ -293,7 +308,7 @@ const statusText = new TextElement(10, 24);
 objects.push(
   new BackGround(),
   new Player(),
-  new Enemy(windowWidth * 3 / 4, windowHeight / 2),
+  new Enemy((windowWidth * 3) / 4, windowHeight / 2),
   new Ground(windowHeight - 20),
   new Block(100, windowHeight - 100, 50),
   new MovingBlock(200, windowHeight - 100, 50, 4, -2, 100),
@@ -301,5 +316,5 @@ objects.push(
   new Block(400, 70, 50),
   new Goal(400, 30),
   statusText
-)
+);
 const game = setInterval(loop, 30, objects, ctx);
