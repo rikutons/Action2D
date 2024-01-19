@@ -144,10 +144,10 @@ class Player extends RigidSquare {
                 this.vy = -30;
                 this.onPlain = false;
             }
-        if (this.key["D"])
+        if (this.key["d"])
             if (this.x < windowWidth - this.size / 2)
                 this.x += 8;
-        if (this.key["A"])
+        if (this.key["a"])
             if (this.x > this.size / 2)
                 this.x -= 8;
         this.x += this.inertiax;
