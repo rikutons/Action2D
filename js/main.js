@@ -121,10 +121,24 @@ class Player extends RigidSquare {
         this.inertiay = 0;
         for (let i = 0; i < 256; i++)
             this.key[i] = 0;
-        this.onKeyDown = function (event) { this.key[event.keyCode]++; };
-        this.onKeyUp = function (event) { this.key[event.keyCode] = 0; };
-        window.addEventListener("keydown", this.onKeyDown.bind(this));
-        window.addEventListener("keyup", this.onKeyUp.bind(this));
+        this.onKeyDown = function (event) {
+            this.key[event.keyCode]++;
+        };
+        this.onKeyUp = function (event) {
+            this.key[event.keyCode] = 0;
+        };
+        window.addEventListener("message", (e) => {
+            switch (e.data.type) {
+                case "keydown":
+                    this.onKeyDown(e.data.e);
+                    break;
+                case "keyup":
+                    this.onKeyUp(e.data.e);
+                    break;
+                default:
+                    break;
+            }
+        });
     }
     update() {
         if (this.key[" ".charCodeAt(0)] > 0)
@@ -165,7 +179,7 @@ function init(width, height) {
     const cvs = document.createElement("canvas");
     cvs.width = width;
     cvs.height = height;
-    (_a = document.getElementById('container')) === null || _a === void 0 ? void 0 : _a.appendChild(cvs);
+    (_a = document.getElementById("container")) === null || _a === void 0 ? void 0 : _a.appendChild(cvs);
     return cvs;
 }
 function hitSquarePlain(square, plain) {
@@ -216,7 +230,8 @@ function checkHit(objects) {
                     statusText.text = "Game Clear!!";
                 }
             }
-            if (o1 instanceof Player && o2 instanceof Block || o1 instanceof Player && o2 instanceof MovingBlock) {
+            if ((o1 instanceof Player && o2 instanceof Block) ||
+                (o1 instanceof Player && o2 instanceof MovingBlock)) {
                 const hit = hit2Square(o1, o2);
                 if (hit) {
                     if (Math.abs(hit[0]) < Math.abs(hit[1]))
@@ -255,5 +270,5 @@ const cvs = init(windowWidth, windowHeight);
 const ctx = cvs.getContext("2d");
 const objects = [];
 const statusText = new TextElement(10, 24);
-objects.push(new BackGround(), new Player(), new Enemy(windowWidth * 3 / 4, windowHeight / 2), new Ground(windowHeight - 20), new Block(100, windowHeight - 100, 50), new MovingBlock(200, windowHeight - 100, 50, 4, -2, 100), new MovingBlock(250, windowHeight - 100, 50, 4, -2, 100), new Block(400, 70, 50), new Goal(400, 30), statusText);
+objects.push(new BackGround(), new Player(), new Enemy((windowWidth * 3) / 4, windowHeight / 2), new Ground(windowHeight - 20), new Block(100, windowHeight - 100, 50), new MovingBlock(200, windowHeight - 100, 50, 4, -2, 100), new MovingBlock(250, windowHeight - 100, 50, 4, -2, 100), new Block(400, 70, 50), new Goal(400, 30), statusText);
 const game = setInterval(loop, 30, objects, ctx);
