@@ -140,8 +140,18 @@ class Player extends RigidSquare {
     for (let i = 0; i < 256; i++) this.key[i] = 0;
     this.onKeyDown = function(event: KeyboardEvent) { this.key[event.keyCode]++; }
     this.onKeyUp = function(event: KeyboardEvent) { this.key[event.keyCode] = 0; }
-    window.addEventListener("keydown", this.onKeyDown.bind(this));
-    window.addEventListener("keyup", this.onKeyUp.bind(this));
+    window.addEventListener("message", (e) => {
+      switch (e.data.type) {
+        case "keydown":
+          this.onKeyDown(e.data.e);
+          break;
+        case "keyup":
+          this.onKeyUp(e.data.e);
+          break;
+        default:
+          break;
+      }
+    });
   }
 
   update() {
