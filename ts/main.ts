@@ -157,12 +157,11 @@ class Player extends RigidSquare {
   inertiay: number = 0;
   constructor() {
     super(windowWidth / 4, windowHeight / 2, 50, "#2478ff");
-    for (let i = 0; i < 256; i++) this.key[i] = 0;
     this.onKeyDown = function (event: KeyboardEvent) {
-      this.key[event.keyCode]++;
+      this.key[event.key] = true;
     };
     this.onKeyUp = function (event: KeyboardEvent) {
-      this.key[event.keyCode] = 0;
+      this.key[event.key] = false;
     };
     window.addEventListener("message", (e) => {
       switch (e.data.type) {
@@ -179,14 +178,14 @@ class Player extends RigidSquare {
   }
 
   update() {
-    if (this.key[" ".charCodeAt(0)] > 0)
+    if (this.key[" "])
       if (this.onPlain) {
         this.vy = -30;
         this.onPlain = false;
       }
-    if (this.key["D".charCodeAt(0)] > 0)
+    if (this.key["D"])
       if (this.x < windowWidth - this.size / 2) this.x += 8;
-    if (this.key["A".charCodeAt(0)] > 0)
+    if (this.key["A"])
       if (this.x > this.size / 2) this.x -= 8;
     this.x += this.inertiax;
     this.y += this.inertiay;
